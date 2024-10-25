@@ -3,8 +3,12 @@ const nextConfig = {
     async rewrites() {
       return [
         {
-          source: '/api/:path*', // Proxy requests starting with /api/
-          destination: 'http://127.0.0.1:5500/:path*', // Proxy target (your Actix Web server)
+          source: '/api/:path*',
+          destination: 'http://127.0.0.1:5500/:path*', 
+        },
+        {
+          source: '/ws/:path*',
+          destination: 'http://ws://127.0.0.1:5500/ws/:path*'
         },
       ];
     },

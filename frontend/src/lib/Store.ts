@@ -1,19 +1,52 @@
-// store.ts
 import { create } from "zustand";
 
-// Define the types for your store's state
 interface AuthState {
-    isLoggedIn: boolean;
-    username: string;
-    login: (username: string) => void; // Add type to the parameter
-    logout: () => void;
+  isLoggedIn: boolean;
+  username: string;
+  login: (username: string) => void;
+  logout: () => void;
 }
 
-// Create the Zustand store
 export const useAuthStore = create<AuthState>((set) => ({
-    isLoggedIn: false,
-    username: '', // Change '=' to ':' for correct syntax
-    login: (username) => set({ isLoggedIn: true, username }), // Correctly update the state
-    logout: () => set({ isLoggedIn: false, username: '' }), // Reset username on logout
+  isLoggedIn: false,
+  username: "", 
+  login: (username) => set({ isLoggedIn: true, username }), 
+  logout: () => set({ isLoggedIn: false, username: "" }), 
 }));
 
+interface PollResults {
+  [key: string]: {
+    votes: number;
+    optionText: string;
+    closed?: boolean;
+  };
+}
+
+
+interface Store {
+  pollResults: PollResults;
+  updatePollResults: (pollId: string | number, optionText: string, newVoteCount: number) => void;
+  closedPolls: Set<number>;
+  setClosedPoll: (pollId: number) => void;
+}
+
+
+export const useStore = create<Store>((set) => ({
+  pollResults: {},
+  closedPolls: new Set<number>(),
+  updatePollResults: (pollId: string | number, optionText: string, newVoteCount: number) =>
+    set((state) => ({
+      pollResults: {
+        ...state.pollResults,
+        [pollId]: {
+          ...(state.pollResults[pollId] || {}), 
+          votes: newVoteCount,
+          optionText, 
+        },
+      },
+    })),
+    setClosedPoll: (pollId: number) => 
+      set((state : Store) => ({
+        closedPolls: new Set(state.closedPolls).add(pollId), 
+      })),
+}));
